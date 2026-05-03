@@ -12,8 +12,8 @@ Tecnologías utilizadas -Base de Datos-
 Equipo
 ---
 
-*   ![LEADER / DATABASE](https://img.shields.io/badge/LEADER_/_DATABASE-E9711C?style=flat-square) **[Zolorza Hugo]** — Argentina 🇦🇷
-*   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Sfligoy Francisco]** — Argentina 🇦🇷
-*   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Pereyra Joaquin]** — Argentina 🇦🇷
-*   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Martinez Daniel]** — Argentina 🇦🇷
+*   ![LEADER / DATABASE](https://img.shields.io/badge/LEADER_/_DATABASE-E9711C?style=flat-square) **[Zolorza Hugo]** — Argentina <img src="https://flagcdn.com/w20/ar.png" width="20">
+*   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Sfligoy Francisco]** — Argentina <img src="https://flagcdn.com/w20/ar.png" width="20">
+*   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Pereyra Joaquin]** — Argentina <img src="https://flagcdn.com/w20/ar.png" width="20">
+*   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Martinez Daniel]** — Argentina <img src="https://flagcdn.com/w20/ar.png" width="20">
 *   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Diaz Exequiel]** — Argentina <img src="https://flagcdn.com/w20/ar.png" width="20">
