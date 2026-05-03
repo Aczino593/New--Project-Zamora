@@ -16,4 +16,4 @@ Equipo
 *   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Sfligoy Francisco]** — Argentina 🇦🇷
 *   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Pereyra Joaquin]** — Argentina 🇦🇷
 *   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Martinez Daniel]** — Argentina 🇦🇷
-*   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Diaz Exequiel]** — Argentina 🇦🇷
+*   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Diaz Exequiel]** — Argentina <img src="https://flagcdn.com/w20/ar.png" width="20">
