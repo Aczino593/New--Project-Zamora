@@ -12,7 +12,7 @@ Tecnologías utilizadas -Base de Datos-
 Equipo
 ---
 
-*   ![LEADER / DATABASE](https://img.shields.io/badge/LEADER_/_FRONTEND-3ECF8E?style=flat-square) **[Zolorza Hugo]** — Argentina 🇦🇷
+*   ![LEADER / DATABASE](https://img.shields.io/badge/LEADER_/_DATABASE-E9711C?style=flat-square) **[Zolorza Hugo]** — Argentina 🇦🇷
 *   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Sfligoy Francisco]** — Argentina 🇦🇷
 *   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Pereyra Joaquin]** — Argentina 🇦🇷
 *   ![DATABASE](https://img.shields.io/badge/DATABASE-E9711C?style=flat-square) **[Martinez Daniel]** — Argentina 🇦🇷
