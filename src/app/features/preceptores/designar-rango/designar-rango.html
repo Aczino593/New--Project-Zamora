@@ -1,0 +1,178 @@
+<div class="dr-container fade-in">
+  
+  <!-- BARRA DE TÍTULO DE SECCIÓN -->
+  <div class="section-top-bar">
+    <div class="section-title">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-1.82.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
+      <h2>Designación de Rangos Estudiantiles</h2>
+    </div>
+    
+    @if (viewMode() === 'edit') {
+      <button class="btn-outline-back" (click)="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>
+        Volver a Buscar
+      </button>
+    }
+  </div>
+
+  <!-- VISTA 1: BÚSQUEDA -->
+  @if (viewMode() === 'search') {
+    <div class="dr-search-view fade-in">
+      
+      <!-- Buscador -->
+      <div class="dr-search-panel">
+        <label class="dr-label">Buscar Alumno (Nombre o DNI):</label>
+        <div class="search-input-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+          <input type="text" class="dr-input" [(ngModel)]="searchQuery" placeholder="Ej. Martínez, o 45678...">
+        </div>
+      </div>
+
+      <!-- Resultados -->
+      <div class="dr-results-panel">
+        @if (searchQuery().length === 0) {
+          <div class="dr-empty-state">
+            Escribe un nombre o DNI para comenzar a buscar.
+          </div>
+        } @else if (filteredStudents().length === 0) {
+          <div class="dr-empty-state">
+            No se encontraron alumnos con "{{ searchQuery() }}".
+          </div>
+        } @else {
+          <div class="dr-table-wrapper">
+            <table class="dr-table">
+              <thead>
+                <tr>
+                  <th>Alumno</th>
+                  <th>DNI</th>
+                  <th>Curso</th>
+                  <th>Rango Actual</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (student of filteredStudents(); track student.id) {
+                  <tr>
+                    <td class="td-bold">{{ student.name }}</td>
+                    <td>{{ student.dni }}</td>
+                    <td>{{ student.course }}</td>
+                    <td>
+                      <span class="rank-badge" 
+                            [class.delegado]="student.role === 'Delegado'" 
+                            [class.subdelegado]="student.role === 'Subdelegado'"
+                            [class.ninguno]="student.role === 'Ninguno'">
+                        {{ student.role }}
+                      </span>
+                    </td>
+                    <td class="td-action">
+                      <button class="btn-dr-primary" (click)="editStudent(student)">Editar</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- VISTA 2: EDICIÓN (Split Layout) -->
+  @if (viewMode() === 'edit' && selectedStudent()) {
+    <div class="dr-edit-layout fade-in">
+      
+      <!-- COLUMNA IZQUIERDA: RESUMEN -->
+      <div class="dr-summary-card">
+        <div class="dr-summary-header">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+          Resumen del Estudiante
+        </div>
+        
+        <div class="dr-summary-body">
+          <h3 class="student-main-name">{{ selectedStudent()!.name }}</h3>
+          
+          <div class="info-list">
+            <!-- Icono 2D Material UI Style (Flat SVGs) -->
+            <div class="info-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="info-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" /></svg>
+              <span><strong>Documento:</strong> {{ selectedStudent()!.dni }}</span>
+            </div>
+            
+            <div class="info-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="info-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" /></svg>
+              <span><strong>Curso:</strong> {{ selectedStudent()!.course }}</span>
+            </div>
+
+            <div class="info-divider"></div>
+
+            <div class="info-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="info-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+              <span>{{ selectedStudent()!.address }}</span>
+            </div>
+
+            <div class="info-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="info-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.518-.209-1.022-.596-1.396l-3.23-3.23a1.99 1.99 0 00-1.42-.584h-1.5c-.534 0-1.026.175-1.425.483l-1.353 1.042a15.034 15.034 0 01-5.69-5.69l1.042-1.353a2.001 2.001 0 00.483-1.425V4.74c0-.54-.22-1.056-.6-1.43l-3.23-3.23a1.99 1.99 0 00-1.407-.584H3.75A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
+              <span>{{ selectedStudent()!.phone }}</span>
+            </div>
+
+            <div class="info-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="info-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+              <span>{{ selectedStudent()!.email }}</span>
+            </div>
+
+            <div class="info-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="info-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
+              <span>{{ selectedStudent()!.birthDate }}</span>
+            </div>
+            
+            <div class="info-divider"></div>
+            
+            <div class="info-item">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="info-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>
+              <span><strong>Tutor:</strong> {{ selectedStudent()!.tutorName }}</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA: DESIGNACIÓN (Panel estilo Facturación/Edición ERP) -->
+      <div class="dr-form-card">
+        <div class="dr-form-header">
+          Designación de Rol Oficial
+        </div>
+        
+        <div class="dr-form-body">
+          <div class="dr-form-group">
+            <label class="dr-label">* Rango / Rol</label>
+            <div class="dr-select-wrapper">
+              <select class="dr-select" [(ngModel)]="selectedStudent()!.role">
+                <option value="Ninguno">Ninguno (Estudiante Regular)</option>
+                <option value="Delegado">Delegado</option>
+                <option value="Subdelegado">Subdelegado</option>
+              </select>
+              <!-- Icono chevron de flecha abajo -->
+              <svg class="select-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+            </div>
+            <span class="dr-help-text">Seleccione el rango que ocupará en su curso.</span>
+          </div>
+
+          <div class="current-status-box" 
+               [class.active-delegado]="selectedStudent()!.role === 'Delegado'"
+               [class.active-subdelegado]="selectedStudent()!.role === 'Subdelegado'">
+            <strong>Estado Actual Asignado:</strong> 
+            <span>{{ selectedStudent()!.role }}</span>
+          </div>
+        </div>
+
+        <div class="dr-form-footer">
+          <button class="btn-dr-save" (click)="saveRole()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" /></svg>
+            Aplicar y Guardar Cambios
+          </button>
+        </div>
+      </div>
+
+    </div>
+  }
+</div>

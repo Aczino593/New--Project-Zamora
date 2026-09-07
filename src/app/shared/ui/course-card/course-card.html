@@ -1,0 +1,14 @@
+<div class="course-card" [routerLink]="['/cursos', course.id]" style="background-image: linear-gradient(to right, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.5) 100%), url('/banner_cursos.webp');">
+  <div class="card-header">
+    <div class="course-title-group">
+      <h3 class="course-name" [title]="course.nombre">{{ course.nombre }}</h3>
+      <span class="course-subtitle">{{ course.year }}° {{ course.division }}° {{ course.cycle === 'basico' ? 'Ciclo Básico' : 'Ciclo Superior' }}</span>
+    </div>
+    <button class="btn-options">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
+    </button>
+  </div>
+  <div class="card-footer">
+    <span class="course-prof">{{ course.specialty }}</span>
+  </div>
+</div>

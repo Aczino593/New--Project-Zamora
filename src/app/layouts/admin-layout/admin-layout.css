@@ -1,0 +1,412 @@
+:host {
+  display: block;
+  --topbar-height: 64px;
+  --sidebar-width: 250px;
+  --admin-bg: #f3f4f6; /* Fondo general */
+  --admin-surface: #ffffff;
+  --admin-text: #333333;
+  --admin-text-light: #6b7280;
+  --admin-border: #e5e7eb;
+  --admin-primary: #0a7a50; /* Verde institucional */
+  --admin-primary-light: #eefcf2;
+  --admin-hover: #f9fafb;
+}
+
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--admin-bg);
+  font-family: 'Inter', 'Roboto', sans-serif;
+}
+
+/* =========================================
+   TOPBAR (HEADER)
+   ========================================= */
+.admin-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--topbar-height);
+  background-color: var(--admin-surface);
+  border-bottom: 1px solid var(--admin-border);
+  padding: 0 16px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.topbar-left, .topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--admin-text-light);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  padding: 8px;
+}
+
+.btn-icon:hover {
+  background-color: var(--admin-hover);
+  color: var(--admin-primary);
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--admin-primary-light);
+}
+
+.brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.institution-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--admin-text);
+}
+
+/* Notificaciones */
+.notification-bell {
+  position: relative;
+}
+
+.notification-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background-color: #ef4444; /* Rojo alerta */
+  border-radius: 50%;
+  border: 2px solid var(--admin-surface);
+}
+
+/* Usuario Dropdown */
+.user-menu-container {
+  position: relative;
+}
+
+.user-avatar {
+  background-color: var(--admin-primary-light);
+  color: var(--admin-primary);
+  border: 1px solid rgba(10, 122, 80, 0.2);
+}
+
+.role-icon-header {
+  width: 20px;
+  height: 20px;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: var(--admin-surface);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  width: 260px;
+  border: 1px solid var(--admin-border);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 101;
+}
+
+.profile-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.profile-header-info {
+  padding: 16px;
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.profile-name {
+  font-weight: 700;
+  color: var(--admin-text);
+  font-size: 1.05rem;
+}
+
+.profile-email, .profile-phone {
+  font-size: 0.85rem;
+  color: var(--admin-text-light);
+}
+
+.profile-role-badge {
+  margin-top: 8px;
+}
+
+.badge {
+  background-color: #f3f4f6;
+  color: #374151;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-directivo {
+  background-color: rgba(10, 122, 80, 0.1);
+  color: var(--admin-primary);
+  border: 1px solid rgba(10, 122, 80, 0.2);
+}
+
+.profile-actions {
+  padding: 8px;
+}
+
+.btn-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-logout svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-logout:hover {
+  background-color: #fef2f2;
+}
+
+
+/* =========================================
+   BODY (SIDEBAR + CONTENT)
+   ========================================= */
+.admin-body {
+  display: flex;
+  margin-top: var(--topbar-height);
+  flex-grow: 1;
+  height: calc(100vh - var(--topbar-height));
+}
+
+.admin-sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--admin-surface);
+  border-right: 1px solid var(--admin-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: var(--topbar-height);
+  bottom: 0;
+  left: 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 90;
+  overflow-y: auto;
+}
+
+/* Ocultar en escritorio cuando está cerrado (colapsado) */
+@media (min-width: 768px) {
+  .admin-sidebar {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .admin-sidebar:not(.open) {
+    width: 64px; /* Ancho colapsado */
+    transform: none; /* Evitamos que se mueva hacia la izquierda */
+    overflow: visible !important; /* Para que el tooltip negro no quede cortado por el borde */
+  }
+  
+  /* Cuando está colapsado, centramos el icono y ocultamos el texto */
+  .admin-sidebar:not(.open) .nav-item {
+    justify-content: center;
+    padding: 12px 0;
+  }
+  
+  .admin-sidebar:not(.open) .nav-text {
+    display: none;
+  }
+  
+  /* Tooltip oscuro */
+  .admin-sidebar:not(.open) .nav-item::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #1a1a1a;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    margin-left: 10px;
+    z-index: 1000;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  /* Flecha del Tooltip */
+  .admin-sidebar:not(.open) .nav-item::before {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #1a1a1a transparent transparent;
+    opacity: 0;
+    visibility: hidden;
+    margin-left: 0px;
+    z-index: 1000;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  
+  /* Mostrar Tooltip al hacer hover solo si está colapsado */
+  .admin-sidebar:not(.open) .nav-item:hover::after,
+  .admin-sidebar:not(.open) .nav-item:hover::before {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .admin-content-wrapper {
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* El contenido se ajusta al ancho colapsado */
+  .admin-sidebar:not(.open) ~ .admin-content-wrapper {
+    margin-left: 64px;
+  }
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px;
+  gap: 4px;
+}
+
+.nav-item {
+  position: relative; /* Necesario para el Tooltip absoluto */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: var(--admin-text-light);
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.nav-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.nav-item:hover {
+  background-color: var(--admin-hover);
+  color: var(--admin-text);
+}
+
+.nav-item.active {
+  background-color: var(--admin-primary-light);
+  color: var(--admin-primary);
+  font-weight: 600;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background-color: var(--admin-border);
+  margin: 12px 0;
+}
+
+.admin-content-wrapper {
+  flex-grow: 1;
+  padding: 24px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+/* =========================================
+   MOBILE RESPONSIVE
+   ========================================= */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 80;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 767px) {
+  .institution-name {
+    display: none;
+  }
+  
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .sidebar-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .admin-content-wrapper {
+    margin-left: 0 !important;
+  }
+}

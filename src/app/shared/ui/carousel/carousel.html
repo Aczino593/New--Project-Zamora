@@ -1,0 +1,53 @@
+<div class="carousel-container">
+  <div class="carousel-slides" [style.transform]="'translateX(-' + (currentIndex() * 100) + '%)'">
+    @for (news of newsList(); track news.id) {
+      <div class="carousel-slide" [ngClass]="news.bgClass">
+        
+        <div class="news-content-wrapper" [class.has-image]="!!news.imageUrl">
+          <div class="news-text">
+            @if (news.tag) {
+              <span class="news-tag">{{ news.tag }}</span>
+            }
+            <h3 class="news-title">{{ news.title }}</h3>
+            <p class="news-desc">{{ news.description }}</p>
+          </div>
+          
+          @if (news.imageUrl) {
+            <div class="news-image-container" (click)="openModal(news.imageUrl)">
+              <img [src]="news.imageUrl" alt="Imagen adjunta" class="news-thumbnail">
+              <div class="img-overlay">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="zoom-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" /></svg>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+  </div>
+  
+  @if (newsList().length > 1) {
+    <button class="nav-btn prev" (click)="prev()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+    </button>
+    <button class="nav-btn next" (click)="next()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+    </button>
+    
+    <div class="carousel-indicators">
+      @for (news of newsList(); track news.id; let i = $index) {
+        <div class="indicator" [class.active]="i === currentIndex()" (click)="currentIndex.set(i)"></div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Modal para ver imagen ampliada -->
+@if (isModalOpen()) {
+  <div class="image-modal-backdrop" (click)="closeModal()">
+    <button class="btn-close-modal" (click)="closeModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+    </button>
+    <img [src]="currentImage()" class="modal-image" (click)="$event.stopPropagation()">
+  </div>
+}

@@ -1,0 +1,71 @@
+<div class="notifications-page fade-in">
+  
+  <div class="notifications-card">
+    
+    <div class="notifications-header">
+      <div class="header-titles">
+        <h2>Centro de Notificaciones</h2>
+        <span class="unread-badge" *ngIf="unreadCount() > 0">{{ unreadCount() }} nuevas</span>
+      </div>
+      <button class="btn-mark-all" (click)="markAllAsRead()" [disabled]="unreadCount() === 0">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+        Marcar todo como leído
+      </button>
+    </div>
+
+    <div class="notifications-list">
+      
+      @if (notifications().length === 0) {
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+          <p>No tienes notificaciones en este momento.</p>
+        </div>
+      }
+
+      @for (notif of notifications(); track notif.id) {
+        <div class="notif-item" 
+             [class.unread]="!notif.isRead" 
+             [class.clickable]="notif.link"
+             (click)="handleNotificationClick(notif)">
+          
+          <div class="notif-icon" [ngClass]="notif.type">
+            <!-- Icono Mensaje -->
+            @if (notif.type === 'message') {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+            } 
+            <!-- Icono Sistema/Alertas -->
+            @else {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+            }
+          </div>
+
+          <div class="notif-content">
+            <div class="notif-top">
+              <h3 class="notif-title">{{ notif.title }}</h3>
+              <span class="notif-time" [title]="formatExactDate(notif.timestamp)">
+                {{ formatTimeAgo(notif.timestamp) }}
+              </span>
+            </div>
+            
+            <p class="notif-desc">{{ notif.description }}</p>
+            
+            <div class="notif-actions">
+              <!-- Solo mostramos botón explícito de redirección si tiene link -->
+              @if (notif.link) {
+                <span class="link-hint">Clic para ver el mensaje ➔</span>
+              }
+              
+              <!-- Botón individual de marcar leído (detiene propagación si se hace clic) -->
+              @if (!notif.isRead) {
+                <button class="btn-check" (click)="markAsRead(notif.id, $event)" title="Marcar como leído">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

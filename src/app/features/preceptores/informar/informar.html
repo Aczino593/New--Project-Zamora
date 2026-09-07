@@ -1,0 +1,139 @@
+<div class="informar-container fade-in">
+  
+  <div class="messenger-card">
+    
+    <!-- VISTA 1: LISTA DE CHATS -->
+    @if (viewMode() === 'list') {
+      <div class="messenger-list-view fade-in">
+        
+        <div class="messenger-header">
+          <h2>Mensajería Institucional</h2>
+          <p>Comunícate de forma segura con la comunidad educativa.</p>
+        </div>
+
+        <!-- Buscador Inteligente -->
+        <div class="search-section">
+          <div class="search-input-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+            <input type="text" 
+                   class="input-search" 
+                   [(ngModel)]="searchQuery" 
+                   placeholder="Buscar directivos, docentes o alumnos por DNI o Nombre...">
+          </div>
+
+          <!-- Resultados del Autocompletado -->
+          @if (searchResults().length > 0) {
+            <div class="search-dropdown">
+              @for (user of searchResults(); track user.id) {
+                <div class="search-result-item">
+                  <div class="user-info">
+                    <img [src]="user.avatar" class="user-avatar" alt="Avatar">
+                    <div class="user-details">
+                      <span class="user-name">{{ user.name }}</span>
+                      <span class="user-meta">DNI: {{ user.dni }} • {{ user.role }}</span>
+                    </div>
+                  </div>
+                  <button class="btn-chat" (click)="startChatWithUser(user)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></svg>
+                    Chatear
+                  </button>
+                </div>
+              }
+            </div>
+          } @else if (searchQuery().length > 0) {
+            <div class="search-dropdown empty">
+              No se encontraron resultados para "{{ searchQuery() }}"
+            </div>
+          }
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- Historial de Chats -->
+        <div class="chats-history">
+          <h3 class="history-title">Conversaciones Recientes</h3>
+          
+          @if (sortedChats().length === 0) {
+            <div class="empty-state">
+              <p>No tienes conversaciones activas. Busca a alguien para empezar a chatear.</p>
+            </div>
+          } @else {
+            <div class="chats-list">
+              @for (chat of sortedChats(); track chat.id) {
+                <div class="chat-card" (click)="openChat(chat)">
+                  <img [src]="chat.user.avatar" class="user-avatar-large" alt="Avatar">
+                  <div class="chat-preview">
+                    <div class="chat-preview-header">
+                      <span class="chat-name">{{ chat.user.name }}</span>
+                      <span class="chat-time">{{ formatTime(chat.lastUpdated) }}</span>
+                    </div>
+                    <span class="chat-role">{{ chat.user.role }}</span>
+                    <p class="chat-last-msg">
+                      {{ chat.messages.length > 0 ? (chat.messages[chat.messages.length - 1].isMine ? 'Tú: ' : '') + chat.messages[chat.messages.length - 1].text : 'Sin mensajes' }}
+                    </p>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- VISTA 2: CHAT PRIVADO -->
+    @if (viewMode() === 'chat' && activeChat()) {
+      <div class="chat-view fade-in">
+        
+        <!-- Cabecera del Chat -->
+        <div class="chat-header">
+          <button class="btn-back" (click)="goBack()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+          </button>
+          
+          <div class="chat-header-user">
+            <img [src]="activeChat()!.user.avatar" class="user-avatar" alt="Avatar">
+            <div class="header-user-info">
+              <span class="header-name">{{ activeChat()!.user.name }}</span>
+              <span class="header-role">{{ activeChat()!.user.role }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área de Mensajes -->
+        <div class="chat-messages" id="chat-messages-container">
+          
+          <div class="encryption-notice">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+            Los mensajes son privados y solo pueden contener texto.
+          </div>
+
+          @for (msg of activeChat()!.messages; track msg.id) {
+            <div class="message-wrapper" [class.mine]="msg.isMine">
+              <div class="message-bubble">
+                <p class="message-text">{{ msg.text }}</p>
+                <div class="message-meta">
+                  {{ formatDate(msg.timestamp) }} {{ formatTime(msg.timestamp) }}
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Zona de Envío -->
+        <div class="chat-input-area">
+          <textarea class="chat-textarea" 
+                    [(ngModel)]="newMessageText" 
+                    placeholder="Escribe tu mensaje aquí..." 
+                    (keydown.enter)="sendMessage(); $event.preventDefault()"
+                    rows="1"></textarea>
+          <button class="btn-send" (click)="sendMessage()" [disabled]="newMessageText().trim().length === 0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
+          </button>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>

@@ -1,0 +1,252 @@
+<div class="search-student-container fade-in" (click)="closeAllPopups()">
+  
+  <!-- BREADCRUMB / SECTION TITLE -->
+  <div class="breadcrumb-bar">
+    <div class="breadcrumb-title">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      <span>Buscador de Alumnos</span>
+    </div>
+    <div class="breadcrumb-path">Inicio / Buscar Estudiantes</div>
+  </div>
+
+  <!-- TOOLBAR (Buscador parcial + Filtros + Total items) -->
+  <div class="toolbar-bar">
+    <div class="toolbar-left">
+      
+      <!-- Buscador Parcial -->
+      <div class="search-input-wrapper">
+        <svg viewBox="0 0 24 24" fill="currentColor" class="search-icon"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" class="input-search" [(ngModel)]="searchQuery" placeholder="Buscar...">
+      </div>
+
+      <!-- Botón de Filtros Avanzados -->
+      <div class="filter-container">
+        <button class="btn-filter" (click)="toggleFilter($event)" [class.active]="isFilterOpen()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39c.51-.66.04-1.61-.79-1.61H5.04c-.83 0-1.3.95-.79 1.61z"/></svg>
+        </button>
+
+        <!-- Popover Filtros -->
+        @if (isFilterOpen()) {
+          <div class="filter-popover fade-in" (click)="$event.stopPropagation()">
+            <h4>Filtros Avanzados</h4>
+            
+            <div class="filter-group">
+              <label>Curso</label>
+              <select [(ngModel)]="filterCourse">
+                <option value="">Todos los Cursos</option>
+                @for (c of uniqueCourses(); track c) { <option [value]="c">{{ c }}</option> }
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Turno</label>
+              <select [(ngModel)]="filterTurno">
+                <option value="">Todos los Turnos</option>
+                @for (t of uniqueTurnos(); track t) { <option [value]="t">{{ t }}</option> }
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Categoría</label>
+              <select [(ngModel)]="filterCategoria">
+                <option value="">Todas las Categorías</option>
+                @for (cat of uniqueCategorias(); track cat) { <option [value]="cat">{{ cat }}</option> }
+              </select>
+            </div>
+            <button class="btn-clear-filters" (click)="clearFilters(); isFilterOpen.set(false)">Limpiar Filtros</button>
+          </div>
+        }
+      </div>
+
+      <!-- Badge Total Items (movido al lado del filtro) -->
+      <div class="results-badge">
+        <span class="count">{{ filteredStudents().length }}</span>
+        <span class="label">Estudiantes</span>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- TABLA DE ESTUDIANTES -->
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 80px; text-align: center;">Estado</th>
+            <th style="width: 60px;">ID</th>
+            <th style="cursor: pointer; user-select: none;" (click)="toggleSort()" title="Ordenar A-Z">
+              <div style="display: flex; align-items: center; gap: 4px;">
+                Nombre y Apellido
+                @if (sortOrder() === 'asc') {
+                  <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
+                }
+                @if (sortOrder() === 'desc') {
+                  <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>
+                }
+                @if (sortOrder() === 'none') {
+                  <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px; color: var(--text-light); opacity: 0.5;"><path d="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z"/></svg>
+                }
+              </div>
+            </th>
+            <th>Contacto</th>
+            <th style="width: 140px;">Observación</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (student of filteredStudents(); track student.id) {
+            <tr>
+              <!-- ESTADO -->
+              <td style="text-align: center; position: relative;">
+                <div class="status-square" 
+                     [class.status-ok]="student.status === 'En orden'"
+                     [class.status-warning]="student.status === 'Repitente'"
+                     (click)="toggleStatusPopover(student.id, $event)">
+                </div>
+                <!-- POPOVER FLOTANTE ESTADO -->
+                @if (activeStatusPopoverId() === student.id) {
+                  <div class="status-popover fade-in">
+                    <span class="popover-badge" 
+                          [class.badge-ok]="student.status === 'En orden'"
+                          [class.badge-warning]="student.status === 'Repitente'">
+                      {{ student.status }}
+                    </span>
+                  </div>
+                }
+              </td>
+
+              <!-- ID -->
+              <td>
+                <span style="font-weight: 600; color: var(--text-light); font-size: 0.9rem;">#{{ student.id }}</span>
+              </td>
+
+              <!-- NOMBRE, APELLIDO Y CORREO -->
+              <td>
+                <div class="personal-data-cell">
+                  <span class="student-name">{{ student.lastName }} {{ student.name }}</span>
+                  <span class="student-email">{{ student.email }}</span>
+                </div>
+              </td>
+
+              <!-- CONTACTO (Curso, Turno, DNI) -->
+              <td>
+                <div class="contact-cell">
+                  <div class="contact-item">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                    <span>{{ student.course }} | {{ student.turno }}</span>
+                  </div>
+                  <div class="contact-item">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.11 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    <span>DNI: {{ student.dni }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- ACCIONES JUNTAS (OJO Y LÁPIZ) -->
+              <td>
+                <div class="actions-group">
+                  <button class="btn-action btn-eye" (click)="openObservations(student)" title="Ver Observaciones">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                  </button>
+                  <button class="btn-action btn-edit" (click)="openDetails(student)" title="Ver Detalles">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+          @if (filteredStudents().length === 0) {
+            <tr>
+              <td colspan="4" class="empty-table">No se encontraron estudiantes.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODALES ================= -->
+
+<!-- MODAL OBSERVACIONES -->
+@if (selectedStudentForObs()) {
+  <div class="modal-backdrop fade-in" (click)="closeObservations()">
+    <div class="modal-content obs-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Observaciones y Sanciones</h3>
+        <button class="btn-close" (click)="closeObservations()">✕</button>
+      </div>
+      <div class="modal-body">
+        <h4 class="student-name-modal">{{ selectedStudentForObs()!.lastName }} {{ selectedStudentForObs()!.name }}</h4>
+        <div class="obs-list">
+          @if (selectedStudentForObs()!.observations.length === 0) {
+            <div class="empty-obs">Sin registro de sanciones.</div>
+          }
+          @for (obs of selectedStudentForObs()!.observations; track obs.date) {
+            <div class="obs-item">
+              <span class="obs-date">{{ obs.date }}</span>
+              <p class="obs-reason">{{ obs.reason }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- MODAL DETALLES (REUTILIZANDO DISEÑO SUMMARY) -->
+@if (selectedStudentForDetails()) {
+  <div class="modal-backdrop fade-in" (click)="closeDetails()">
+    <div class="modal-content details-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Detalles del Alumno</h3>
+        <button class="btn-close" (click)="closeDetails()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="summary-card-readonly">
+          <div class="summary-header">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            Resumen del Estudiante
+          </div>
+          <div class="summary-body">
+            <h3 class="student-main-name">{{ selectedStudentForDetails()!.lastName }} {{ selectedStudentForDetails()!.name }}</h3>
+            <div class="info-list">
+              <div class="info-item">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="info-icon"><path d="M14 2H6c-1.11 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                <span><strong>DNI:</strong> {{ selectedStudentForDetails()!.dni }}</span>
+              </div>
+              <div class="info-item">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="info-icon"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                <span><strong>Curso:</strong> {{ selectedStudentForDetails()!.course }} ({{ selectedStudentForDetails()!.turno }})</span>
+              </div>
+              <div class="info-item">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="info-icon"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+                <span><strong>Categoría:</strong> {{ selectedStudentForDetails()!.categoria }}</span>
+              </div>
+              <div class="info-divider"></div>
+              <div class="info-item">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="info-icon"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <span>{{ selectedStudentForDetails()!.address }}</span>
+              </div>
+              <div class="info-item">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="info-icon"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                <span>{{ selectedStudentForDetails()!.phone }}</span>
+              </div>
+              <div class="info-item">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="info-icon"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                <span>{{ selectedStudentForDetails()!.email }}</span>
+              </div>
+              <div class="info-item">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="info-icon"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                <span>{{ selectedStudentForDetails()!.birthDate }}</span>
+              </div>
+              <div class="info-divider"></div>
+              <div class="info-item">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="info-icon"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span><strong>Tutor:</strong> {{ selectedStudentForDetails()!.tutorName }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
