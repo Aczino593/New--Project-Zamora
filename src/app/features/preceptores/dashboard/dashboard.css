@@ -1,0 +1,145 @@
+.dashboard-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  margin-bottom: 32px;
+}
+
+.welcome-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 8px 0;
+}
+
+.welcome-subtitle {
+  font-size: 1.1rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.welcome-subtitle strong {
+  color: var(--primary-green);
+}
+
+.filters-section {
+  background-color: var(--bg-surface);
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  margin-bottom: 32px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  margin-right: 8px;
+}
+
+.filter-pill {
+  background-color: var(--bg-hover);
+  border: 1px solid transparent;
+  color: #475569;
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-pill:hover {
+  background-color: #e2e8f0;
+}
+
+.filter-pill.active {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--primary-green);
+  border-color: #a7f3d0;
+}
+
+.filter-pill.small {
+  padding: 6px 16px;
+  font-size: 0.9rem;
+}
+
+.section-header {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 0;
+  background-color: var(--bg-surface);
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 48px;
+  height: 48px;
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.btn-clear-filters {
+  background-color: var(--primary-green);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-clear-filters:hover {
+  background-color: #064e3b;
+}
+
+@media (max-width: 768px) {
+  .dashboard-page {
+    padding: 16px;
+  }
+  
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+}

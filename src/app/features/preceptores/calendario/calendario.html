@@ -1,0 +1,173 @@
+<div class="calendar-page fade-in">
+  
+  <div class="calendar-header-title">
+    <h1>Calendario Institucional</h1>
+    <p>Cronograma escolar, fechas de exámenes y eventos oficiales.</p>
+  </div>
+
+  <div class="calendar-layout">
+    
+    <!-- Sección Izquierda: El Calendario -->
+    <div class="calendar-container">
+      <div class="calendar-controls">
+        <button class="btn-icon" (click)="prevMonth()" [disabled]="!canGoPrev()" [class.disabled]="!canGoPrev()" aria-label="Mes anterior">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+        </button>
+        <h2 class="month-title">{{ currentMonthName() }} {{ currentYearName() }}</h2>
+        <button class="btn-icon" (click)="nextMonth()" [disabled]="!canGoNext()" [class.disabled]="!canGoNext()" aria-label="Mes siguiente">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+        </button>
+      </div>
+
+      <div class="calendar-grid-header">
+        @for (day of weekDays; track day) {
+          <div class="weekday">{{ day }}</div>
+        }
+      </div>
+
+      <div class="calendar-grid">
+        @for (cell of calendarGrid(); track $index) {
+          <div class="day-cell" 
+               [class.empty]="!cell.dayNumber" 
+               [class.today]="cell.isToday"
+               [class.selected]="selectedDate() === cell.dateStr"
+               [class.has-event]="cell.event !== null"
+               (click)="selectDate(cell.dateStr)">
+            
+            @if (cell.dayNumber) {
+              <span class="day-number">{{ cell.dayNumber }}</span>
+              
+              @if (cell.event) {
+                <div class="event-dot" [class.public]="cell.event.visibility === 'todos'" [class.private]="cell.event.visibility === 'privado'"></div>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <div class="calendar-legend">
+        <div class="legend-item">
+          <div class="event-dot public"></div>
+          <span>Evento / Examen Escolar</span>
+        </div>
+        @if (canEditEvents) {
+          <div class="legend-item">
+            <div class="event-dot private"></div>
+            <span>Nota Interna</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Sección Derecha: Modo Edición (Docentes/Preceptores) o Modo Lectura (Alumnos/Tutores) -->
+    <div class="event-panel">
+      @if (selectedDate()) {
+        <!-- CASO 1: DOCENTE / PRECEPTOR (PUEDE CREAR AVISOS Y PRUEBAS) -->
+        @if (canEditEvents) {
+          <div class="panel-header">
+            <div>
+              <h3>{{ selectedEvent() ? 'Editar Aviso / Fecha' : 'Nuevo Aviso / Examen' }}</h3>
+              <span class="badge-role-hint">Exclusivo Docentes & Preceptoría</span>
+            </div>
+            <span class="selected-date-badge">{{ formatDateFriendly(selectedDate()) }}</span>
+          </div>
+
+          <div class="form-body">
+            <div class="form-group">
+              <label>Título del Aviso / Examen</label>
+              <input type="text" 
+                     class="modal-input" 
+                     placeholder="Ej: Prueba Trimestral de Algoritmos" 
+                     [ngModel]="formData().title" 
+                     (ngModelChange)="formData().title = $event">
+            </div>
+
+            <div class="form-group">
+              <label>Tipo de Evento</label>
+              <select class="modal-input" [ngModel]="formData().type" (ngModelChange)="formData().type = $event">
+                <option value="Examen">📝 Examen / Evaluación</option>
+                <option value="Aviso">📢 Aviso a Alumnos</option>
+                <option value="Reunión">👥 Reunión Institucional</option>
+                <option value="Feriado">📅 Feriado / Asueto</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Descripción / Consignas</label>
+              <textarea rows="3" 
+                        class="input-textarea" 
+                        placeholder="Detalla horario, temas o material necesario..."
+                        [ngModel]="formData().description"
+                        (ngModelChange)="formData().description = $event"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Visibilidad</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="visibility" value="todos" [ngModel]="formData().visibility" (ngModelChange)="formData().visibility = $event">
+                  <span class="radio-custom"></span>
+                  Público para Alumnos y Docentes
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="visibility" value="privado" [ngModel]="formData().visibility" (ngModelChange)="formData().visibility = $event">
+                  <span class="radio-custom"></span>
+                  Solo yo (Privado)
+                </label>
+              </div>
+            </div>
+
+            <div class="panel-actions">
+              @if (selectedEvent()) {
+                <button class="btn-danger" (click)="deleteEvent()">Eliminar</button>
+              }
+              <button class="btn-primary" (click)="saveEvent()">Guardar Aviso</button>
+            </div>
+          </div>
+        } 
+        <!-- CASO 2: ALUMNOS Y TUTORES (SOLO LECTURA SEGÚN PDF) -->
+        @else {
+          <div class="panel-header">
+            <div>
+              <h3>Avisos del Día</h3>
+              <span class="badge-role-hint">Modo Consulta</span>
+            </div>
+            <span class="selected-date-badge">{{ formatDateFriendly(selectedDate()) }}</span>
+          </div>
+
+          <div class="readonly-event-body">
+            @if (selectedEvent(); as ev) {
+              <div class="event-card-detail">
+                <div class="event-type-pill" [class.exam]="ev.type === 'Examen'">
+                  {{ ev.type || 'Aviso Escolar' }}
+                </div>
+                <h4 class="event-detail-title">{{ ev.title || 'Aviso Institucional' }}</h4>
+                <p class="event-detail-desc">{{ ev.description }}</p>
+                <div class="event-detail-footer">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Fecha fijada en el calendario oficial</span>
+                </div>
+              </div>
+            } @else {
+              <div class="no-event-box">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+                <p>No hay exámenes ni avisos programados para este día.</p>
+              </div>
+            }
+          </div>
+        }
+      } @else {
+        <!-- Estado Vacío -->
+        <div class="empty-panel">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="empty-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" /></svg>
+          <p>Selecciona cualquier fecha en el calendario para consultar o registrar eventos.</p>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

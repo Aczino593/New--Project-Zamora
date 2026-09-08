@@ -1,0 +1,50 @@
+<div class="dashboard-page">
+  <!-- Carrusel de Noticias -->
+  <app-carousel></app-carousel>
+
+  <!-- Bienvenida -->
+  <section class="welcome-section">
+    <h1 class="welcome-title">¡Hola, {{ preceptorName }}!</h1>
+    <p class="welcome-subtitle">Tienes <strong>{{ allCourses().length }}</strong> cursos a tu cargo en total.</p>
+  </section>
+
+  <!-- Filtros -->
+  <section class="filters-section">
+    <div class="filter-group">
+      <span class="filter-label">Ciclo:</span>
+      <button class="filter-pill" [class.active]="selectedCycle() === 'todos'" (click)="setCycleFilter('todos')">Todos</button>
+      <button class="filter-pill" [class.active]="selectedCycle() === 'basico'" (click)="setCycleFilter('basico')">Básico</button>
+      <button class="filter-pill" [class.active]="selectedCycle() === 'superior'" (click)="setCycleFilter('superior')">Superior</button>
+    </div>
+
+    <div class="filter-group" *ngIf="selectedCycle() !== 'todos'">
+      <span class="filter-label">Año:</span>
+      @for (year of availableYears(); track year) {
+        <button class="filter-pill small" [class.active]="selectedYear() === year" (click)="setYearFilter(year)">{{ year }}°</button>
+      }
+    </div>
+  </section>
+
+  <!-- Grilla de Cursos -->
+  <section class="courses-section">
+    <div class="section-header">
+      <h2 class="section-title">Cursos Asignados ({{ filteredCourses().length }})</h2>
+    </div>
+    
+    @if (filteredCourses().length > 0) {
+      <div class="courses-grid">
+        @for (curso of filteredCourses(); track curso.id) {
+          <app-course-card [course]="curso"></app-course-card>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="empty-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <p>No se encontraron cursos con estos filtros.</p>
+        <button class="btn-clear-filters" (click)="setCycleFilter('todos')">Limpiar Filtros</button>
+      </div>
+    }
+  </section>
+</div>

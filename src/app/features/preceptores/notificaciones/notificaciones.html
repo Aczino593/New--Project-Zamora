@@ -1,0 +1,147 @@
+<div class="notifications-page fade-in">
+  
+  <div class="notifications-card">
+    
+    <div class="notifications-header">
+      <div class="header-titles">
+        <div class="title-with-badge">
+          <h2>Centro de Notificaciones</h2>
+          <span class="unread-badge" *ngIf="unreadCount() > 0">{{ unreadCount() }} nuevas</span>
+        </div>
+        <p class="header-subtitle">Avisos institucionales, comunicados de docentes y novedades del sistema.</p>
+      </div>
+
+      <div class="header-actions">
+        <!-- BOTÓN EXCLUSIVO PARA DOCENTES SEGÚN ESPECIFICACIÓN DEL PDF -->
+        @if (isDocente) {
+          <button class="btn-create-notice" (click)="openCreateModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span>Nuevo Aviso a Alumnos</span>
+          </button>
+        }
+
+        <button class="btn-mark-all" (click)="markAllAsRead()" [disabled]="unreadCount() === 0">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          Marcar todo leído
+        </button>
+      </div>
+    </div>
+
+    <div class="notifications-list">
+      
+      @if (notifications().length === 0) {
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+          </svg>
+          <p>No tienes notificaciones en este momento.</p>
+        </div>
+      }
+
+      <!-- LISTA UNIFORME CON MEJOR DISEÑO SEGÚN NOTA DEL PDF -->
+      @for (notif of notifications(); track notif.id) {
+        <div class="notif-item" 
+             [class.unread]="!notif.isRead" 
+             [class.clickable]="notif.link"
+             (click)="handleNotificationClick(notif)">
+          
+          <div class="notif-icon-wrapper" [ngClass]="notif.type">
+            @if (notif.type === 'docente') {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+              </svg>
+            } @else if (notif.type === 'message') {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              </svg>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+              </svg>
+            }
+          </div>
+
+          <div class="notif-body">
+            <div class="notif-header-line">
+              <div class="notif-meta">
+                <span class="category-badge" [ngClass]="notif.type">{{ notif.category }}</span>
+                <span class="course-tag" *ngIf="notif.courseTarget">{{ notif.courseTarget }}</span>
+              </div>
+              <span class="notif-time" [title]="formatExactDate(notif.timestamp)">
+                {{ formatTimeAgo(notif.timestamp) }}
+              </span>
+            </div>
+
+            <h3 class="notif-title">{{ notif.title }}</h3>
+            <p class="notif-desc">{{ notif.description }}</p>
+
+            <div class="notif-footer-line">
+              <span class="action-link" *ngIf="notif.link">Ver conversación ➔</span>
+              <button class="btn-check-item" *ngIf="!notif.isRead" (click)="markAsRead(notif.id, $event)" title="Marcar como leída">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                <span>Marcar leída</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PARA QUE EL DOCENTE REDACTE AVISO (EXCLUSIVO DOCENTE) -->
+@if (isModalOpen()) {
+  <div class="modal-backdrop" (click)="closeCreateModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h3>Redactar Aviso para Alumnos</h3>
+          <p>Publica un comunicado o aviso de examen para los alumnos de tu materia.</p>
+        </div>
+        <button class="btn-close" (click)="closeCreateModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Materia / Curso</label>
+          <select class="modal-input" [ngModel]="newCourse()" (ngModelChange)="newCourse.set($event)">
+            <option value="4° 3° CS - Informática">4° 3° CS - Programación Web</option>
+            <option value="5° 2° CS - Mantenimiento">5° 2° CS - Mantenimiento de Software</option>
+            <option value="3° 3° CS - Informática">3° 3° CS - Informática Aplicada</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Tipo de Notificación</label>
+          <div class="category-pills">
+            <button type="button" class="pill" [class.active]="newCategory() === 'Examen'" (click)="newCategory.set('Examen')">📝 Fecha de Prueba</button>
+            <button type="button" class="pill" [class.active]="newCategory() === 'Tarea'" (click)="newCategory.set('Tarea')">📌 Tarea / TP</button>
+            <button type="button" class="pill" [class.active]="newCategory() === 'Aviso'" (click)="newCategory.set('Aviso')">📢 Aviso General</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Título del Aviso</label>
+          <input type="text" class="modal-input" placeholder="Ej: Fecha para la prueba de Algoritmos" [ngModel]="newTitle()" (ngModelChange)="newTitle.set($event)">
+        </div>
+
+        <div class="form-group">
+          <label>Mensaje o Detalle</label>
+          <textarea class="modal-textarea" rows="4" placeholder="Detalla las consignas, horarios o temas a evaluar..." [ngModel]="newDescription()" (ngModelChange)="newDescription.set($event)"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeCreateModal()">Cancelar</button>
+        <button class="btn-primary" (click)="submitDocenteNotice()">Enviar Notificación</button>
+      </div>
+    </div>
+  </div>
+}

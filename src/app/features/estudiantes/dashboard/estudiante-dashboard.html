@@ -1,0 +1,117 @@
+<div class="dashboard-container fade-in">
+  
+  <!-- 1. CARTEL DE BIENVENIDA DESTACADO SEGÚN ESPECIFICACIÓN DEL PDF -->
+  <section class="welcome-hero-banner">
+    <div class="welcome-text-group">
+      <div class="welcome-pill">
+        <span class="pulse-dot"></span>
+        <span>Estudiante Activo • Ciclo Lectivo 2026</span>
+      </div>
+      <h1 class="welcome-title">¡Hola, {{ user()?.name || 'Estudiante' }}!</h1>
+      <p class="welcome-desc">
+        Bienvenido a tu portal académico de la E.E.T. N°3139. Aquí podrás acceder a tus materias, entregas y eventos escolares.
+      </p>
+    </div>
+
+    <div class="welcome-course-chip" *ngIf="user()?.course">
+      <span class="chip-label">Curso Actual</span>
+      <span class="chip-val">{{ user()?.course }}</span>
+      <span class="chip-role-badge" *ngIf="user()?.isDelegado">⭐ Delegado Oficial</span>
+    </div>
+  </section>
+
+  <!-- 2. PANEL DE NOTICIAS CON FILTRO EXCLUSIVO DE "EVENTO" SEGÚN ANOTACIÓN DEL PDF -->
+  <section class="news-section">
+    <div class="section-header-compact">
+      <div class="section-title-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="section-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
+        </svg>
+        <h2>Novedades y Eventos Escolares</h2>
+      </div>
+      <span class="filter-indicator-badge">Filtrado: Categoría EVENTO</span>
+    </div>
+
+    <!-- Carrusel reutilizado pasando categoryFilter="EVENTO" -->
+    <app-carousel [categoryFilter]="'EVENTO'"></app-carousel>
+  </section>
+
+  <!-- 3. GRID DE CURSOS ASIGNADOS CON ESTÉTICA GOOGLE CLASSROOM Y BOTÓN (+) PARA UNIRSE A CLASE -->
+  <section class="courses-section">
+    <div class="courses-header-bar">
+      <div>
+        <h2>Mis Clases y Materias</h2>
+        <p class="section-subtitle">Accede al aula virtual de cada materia para ver novedades y tareas.</p>
+      </div>
+
+      <!-- BOTÓN (+) TIPO CLASSROOM PARA UNIRSE A CLASE CON ENLACE DE PRECEPTORÍA -->
+      <button class="btn-join-class" (click)="openJoinModal()" title="Unirse a una clase">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        <span>Unirse a una clase</span>
+      </button>
+    </div>
+
+    <!-- Cuadrícula de tarjetas de cursos estilo Classroom -->
+    <div class="courses-grid">
+      @for (c of courses(); track c.id) {
+        <app-course-card [course]="c" [routePrefix]="'/estudiantes/clases'"></app-course-card>
+      }
+    </div>
+  </section>
+
+</div>
+
+<!-- MODAL TIPO GOOGLE CLASSROOM PARA UNIRSE A UNA CLASE -->
+@if (isJoinModalOpen()) {
+  <div class="modal-backdrop" (click)="closeJoinModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="classroom-icon-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+            </svg>
+          </div>
+          <div>
+            <h3>Unirse a una clase</h3>
+            <p>Ingresa el enlace o código que te compartió tu preceptor o docente.</p>
+          </div>
+        </div>
+        <button class="btn-close" (click)="closeJoinModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="account-card">
+          <img [src]="user()?.avatar" class="user-avatar-sm" alt="Avatar">
+          <div class="account-info">
+            <span class="account-name">{{ user()?.name }}</span>
+            <span class="account-email">{{ user()?.email }}</span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 16px;">
+          <label for="courseCodeInput">Código o Enlace de la clase</label>
+          <input type="text" 
+                 id="courseCodeInput"
+                 class="modal-input" 
+                 placeholder="Ej: https://institucion.edu/join/43cs-info o 43cs-info"
+                 [ngModel]="joinCodeInput()"
+                 (ngModelChange)="joinCodeInput.set($event)"
+                 (keydown.enter)="confirmJoinCourse()">
+          <span class="input-hint">
+            Pide a tu preceptor el enlace generado de la materia para darte de alta inmediatamente.
+          </span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeJoinModal()">Cancelar</button>
+        <button class="btn-primary" (click)="confirmJoinCourse()" [disabled]="joinCodeInput().trim().length === 0">
+          Unirse a la clase
+        </button>
+      </div>
+    </div>
+  </div>
+}

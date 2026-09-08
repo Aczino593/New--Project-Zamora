@@ -1,0 +1,137 @@
+.course-card {
+  height: 165px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0a7a50 0%, #064e3b 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 18px;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.course-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+}
+
+.course-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -6px rgba(10, 122, 80, 0.35);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 1;
+}
+
+.course-title-group {
+  display: flex;
+  flex-direction: column;
+  max-width: 82%;
+}
+
+.course-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-subtitle {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-top: 4px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-options {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  color: white;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-options:hover {
+  background-color: rgba(255, 255, 255, 0.28);
+}
+
+.btn-options svg {
+  width: 18px;
+  height: 18px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  z-index: 1;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.prof-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 70%;
+}
+
+.prof-avatar-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.prof-avatar-dot svg {
+  width: 14px;
+  height: 14px;
+}
+
+.course-prof {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}

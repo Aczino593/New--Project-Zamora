@@ -1,0 +1,262 @@
+<div class="course-page fade-in">
+  <!-- Hero Section -->
+  <div class="course-hero">
+    <div class="hero-content">
+      <div class="hero-badge">{{ courseInfo.cycle }}</div>
+      <h1 class="hero-title">{{ courseInfo.name }} - {{ courseInfo.specialty }}</h1>
+      <p class="hero-subtitle">{{ courseInfo.shift }} • Gestión de Curso Activa</p>
+    </div>
+  </div>
+
+  <!-- Pestañas -->
+  <div class="tabs-container">
+    <button class="tab-btn" [class.active]="currentTab() === 'asistencia'" (click)="setTab('asistencia')">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
+      Asistencia Diaria
+    </button>
+    <button class="tab-btn" [class.active]="currentTab() === 'materias'" (click)="setTab('materias')">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+      Materias y Profesores
+    </button>
+  </div>
+
+  <div class="tab-content">
+    
+    <!-- PESTAÑA: ASISTENCIA -->
+    @if (currentTab() === 'asistencia') {
+      <div class="attendance-section fade-in">
+        <div class="attendance-header">
+          <div class="date-selector">
+            <label>Fecha de Asistencia:</label>
+            <input type="date" class="input-field" [(ngModel)]="attendanceDate" [disabled]="isAttendanceSaved()">
+          </div>
+          <div class="attendance-actions">
+            @if (isAttendanceSaved()) {
+              <div class="badge-success">Asistencia Guardada</div>
+            } @else {
+              <button class="btn-primary" (click)="saveAttendance()">Guardar Asistencia</button>
+            }
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="students-table">
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th class="text-center">Presente</th>
+                <th class="text-center">Ausente</th>
+                <th class="text-center">Justificado</th>
+                <th>Observación</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (student of students(); track student.id) {
+                <!-- Obtenemos el registro de este estudiante -->
+                @if (attendanceList().find(r => r.studentId === student.id); as record) {
+                  <tr>
+                    <td>
+                      <div class="student-info">
+                        <img [src]="student.avatar" alt="Avatar" class="avatar">
+                        <span class="student-name">{{ student.name }}</span>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      <button class="toggle-btn present" 
+                              [class.active]="record.state === 'presente'"
+                              (click)="setAttendance(student.id, 'presente')">P</button>
+                    </td>
+                    <td class="text-center">
+                      <button class="toggle-btn absent" 
+                              [class.active]="record.state === 'ausente'"
+                              (click)="setAttendance(student.id, 'ausente')">A</button>
+                    </td>
+                    <td class="text-center">
+                      <button class="toggle-btn justified" 
+                              [class.active]="record.state === 'justificado'"
+                              (click)="setAttendance(student.id, 'justificado')">J</button>
+                    </td>
+                    <td class="obs-cell">
+                      @if (record.justificationText) {
+                        <span class="obs-text" [title]="record.justificationText">{{ record.justificationText }}</span>
+                      }
+                      @if (record.justificationFile) {
+                        <span class="obs-file">📎</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- PESTAÑA: MATERIAS -->
+    @if (currentTab() === 'materias') {
+      <div class="subjects-section fade-in">
+        <div class="subjects-header">
+          <h2>Clases del Curso</h2>
+          <button class="btn-primary" (click)="openSubjectModal()">+ Añadir Materia</button>
+        </div>
+
+        @if (subjects().length === 0) {
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="empty-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+            <p>Aún no has creado ninguna materia para este curso.</p>
+          </div>
+        } @else {
+          <div class="subjects-grid">
+            @for (subj of subjects(); track subj.id) {
+              <div class="subject-card">
+                <div class="subject-card-header">
+                  <h3 class="subject-name">{{ subj.name }}</h3>
+                  <button class="btn-icon text-red" (click)="deleteSubject(subj.id)" title="Eliminar Materia">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                  </button>
+                </div>
+                <div class="subject-details">
+                  <p><strong>Profesor:</strong> {{ subj.professorName }}</p>
+                  <p><strong>Horario:</strong> {{ subj.schedule }}</p>
+                </div>
+                <div class="subject-links">
+                  <div class="link-box">
+                    <span class="link-label">Link Profesores (Llave)</span>
+                    <input type="text" [value]="subj.linkProfessor" readonly class="input-readonly-small">
+                  </div>
+                  <div class="link-box">
+                    <span class="link-label">Link Estudiantes</span>
+                    <input type="text" [value]="subj.linkStudents" readonly class="input-readonly-small">
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- ================= MODALES ================= -->
+
+<!-- Modal Justificación -->
+@if (isJustifyModalOpen()) {
+  <div class="modal-backdrop fade-in" (click)="closeJustifyModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Justificar Falta</h2>
+        <button class="btn-icon" (click)="closeJustifyModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-hint">Modificando asistencia para pasar de Ausente a <strong>Justificado/Presente</strong>.</p>
+        
+        <div class="form-group">
+          <label>Motivo / Observación</label>
+          <textarea rows="3" class="input-field" [(ngModel)]="justifyText" placeholder="Escribe el porqué..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Adjuntar Certificado (Opcional)</label>
+          <input type="file" class="input-field" (change)="onFileSelected($event)">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeJustifyModal()">Cancelar</button>
+        <button class="btn-primary" (click)="confirmJustification()">Confirmar Cambio</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Crear Materia -->
+@if (isSubjectModalOpen()) {
+  <div class="modal-backdrop fade-in" (click)="closeSubjectModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Crear Nueva Materia</h2>
+        <button class="btn-icon" (click)="closeSubjectModal()">✕</button>
+      </div>
+      
+      @if (newLinks()) {
+        <!-- Vista de Éxito con Links -->
+        <div class="modal-body success-state">
+          <div class="success-icon">✓</div>
+          <h3>¡Materia Creada Exitosamente!</h3>
+          <p>Se han generado los enlaces de acceso para esta materia.</p>
+          
+          <div class="links-result-container">
+            <div class="link-group">
+              <label>🔗 Enlace para el Profesor (Permisos de clase)</label>
+              <input type="text" [value]="newLinks()?.prof" readonly class="input-field highlight">
+            </div>
+            <div class="link-group mt-3">
+              <label>👥 Enlace para Estudiantes</label>
+              <input type="text" [value]="newLinks()?.student" readonly class="input-field">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-primary w-100" (click)="closeSubjectModal()">Entendido</button>
+        </div>
+      } @else {
+        <!-- Formulario de Creación -->
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Nombre de la Materia</label>
+              <input type="text" class="input-field" [(ngModel)]="newSubject().name" placeholder="Ej. Matemáticas">
+            </div>
+            <div class="form-group">
+              <label>División</label>
+              <select class="input-field" [(ngModel)]="newSubject().division">
+                <option>Ciclo Básico</option>
+                <option>Ciclo Superior</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Especialidad</label>
+              <select class="input-field" [(ngModel)]="newSubject().specialty">
+                <option>Informática</option>
+                <option>Automotor</option>
+                <option>No definida</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Turno</label>
+              <select class="input-field" [(ngModel)]="newSubject().shift">
+                <option>Mañana</option>
+                <option>Tarde</option>
+                <option>Noche</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Hora Inicio</label>
+              <input type="time" class="input-field" [(ngModel)]="newSubject().scheduleStart">
+            </div>
+            <div class="form-group">
+              <label>Hora Fin</label>
+              <input type="time" class="input-field" [(ngModel)]="newSubject().scheduleEnd">
+            </div>
+          </div>
+          
+          <div class="sidebar-divider"></div>
+          
+          <div class="form-group search-professor">
+            <label>Asignar Profesor a Cargo</label>
+            <div class="search-input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+              <input type="text" class="input-field with-icon" [(ngModel)]="newSubject().professorSearch" placeholder="Buscar por Nombre, Apellido o DNI...">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="closeSubjectModal()">Cancelar</button>
+          <button class="btn-primary" (click)="createSubject()">Generar Links de Materia</button>
+        </div>
+      }
+    </div>
+  </div>
+}

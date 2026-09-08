@@ -1,0 +1,188 @@
+<div class="classroom-page fade-in">
+  
+  <!-- Barra Superior con Botón Volver -->
+  <div class="top-nav-bar">
+    <a [routerLink]="backLink" class="btn-back">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      <span>Volver al Dashboard</span>
+    </a>
+  </div>
+
+  <!-- Banner Estilo Google Classroom -->
+  <div class="classroom-hero-banner">
+    <div class="banner-content">
+      <div class="banner-header-line">
+        <span class="banner-badge">{{ course().cycle === 'basico' ? 'Ciclo Básico' : 'Ciclo Superior' }}</span>
+        <span class="banner-tag">{{ course().specialty }}</span>
+      </div>
+      <h1 class="banner-title">{{ course().nombre }}</h1>
+      <p class="banner-subtitle">{{ course().professor }} • {{ course().shift || 'Turno Mañana' }} • {{ course().room || 'Aula 12' }}</p>
+    </div>
+
+    <!-- Enlaces provistos por Preceptoría -->
+    <div class="banner-links-box">
+      <div class="link-item" (click)="copyLink('student')" title="Clic para copiar enlace de alumnos">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+        </svg>
+        <span>Link Alumnos</span>
+      </div>
+      @if (isDocente) {
+        <div class="link-item prof" (click)="copyLink('prof')" title="Enlace de administración de Preceptoría">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+          <span>Link Docente</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Pestañas Tipo Classroom -->
+  <div class="classroom-tabs">
+    <button class="tab-item" [class.active]="currentTab() === 'novedades'" (click)="setTab('novedades')">
+      Tablón
+    </button>
+    <button class="tab-item" [class.active]="currentTab() === 'trabajos'" (click)="setTab('trabajos')">
+      Trabajo de clase
+    </button>
+    <button class="tab-item" [class.active]="currentTab() === 'personas'" (click)="setTab('personas')">
+      Personas
+    </button>
+  </div>
+
+  <!-- CONTENIDO DE LAS PESTAÑAS -->
+  <div class="classroom-tab-content">
+    
+    <!-- PESTAÑA 1: TABLÓN / NOVEDADES -->
+    @if (currentTab() === 'novedades') {
+      <div class="tablon-layout">
+        
+        <!-- Tarjeta Lateral de Próximas Entregas -->
+        <aside class="upcoming-card">
+          <h4>Próximas entregas</h4>
+          <div class="upcoming-item">
+            <span class="task-name">Trabajo Práctico N° 1</span>
+            <span class="task-date">Vence este viernes 23:59</span>
+          </div>
+          <div class="upcoming-item">
+            <span class="task-name">Fecha para la prueba</span>
+            <span class="task-date">Viernes 20 Septiembre</span>
+          </div>
+        </aside>
+
+        <!-- Feed del Tablón -->
+        <div class="feed-container">
+          
+          <!-- Cuadro para publicar (Docentes o Delegados) -->
+          <div class="post-creator-card">
+            <div class="creator-input-area">
+              <img [src]="authService.currentUser()?.avatar" class="user-avatar-sm" alt="Avatar">
+              <textarea [(ngModel)]="newPostContent" 
+                        placeholder="Anuncia algo a la clase (ej. fecha de prueba, consigna, recordatorio)..." 
+                        rows="2"></textarea>
+            </div>
+            <div class="creator-actions">
+              <button class="btn-publish" (click)="publishPost()" [disabled]="newPostContent().trim().length === 0">
+                Publicar
+              </button>
+            </div>
+          </div>
+
+          <!-- Publicaciones -->
+          @for (post of posts(); track post.id) {
+            <div class="post-card" [class.teacher-post]="post.isTeacher">
+              <div class="post-header">
+                <img [src]="post.avatar" class="post-avatar" alt="Avatar">
+                <div class="post-author-info">
+                  <div class="author-name-group">
+                    <span class="author-name">{{ post.author }}</span>
+                    <span class="role-pill" [class.teacher]="post.isTeacher">{{ post.authorRole }}</span>
+                  </div>
+                  <span class="post-date">{{ post.date }}</span>
+                </div>
+              </div>
+              <div class="post-body">
+                <p>{{ post.content }}</p>
+              </div>
+            </div>
+          }
+
+        </div>
+
+      </div>
+    }
+
+    <!-- PESTAÑA 2: TRABAJO DE CLASE -->
+    @if (currentTab() === 'trabajos') {
+      <div class="works-layout">
+        <div class="works-header">
+          <h2>Contenidos y Asignaciones</h2>
+          <span class="status-badge-pending">Estado: PENDIENTE DE PROGRAMA DEFINITIVO</span>
+        </div>
+
+        <div class="units-list">
+          @for (task of tasks(); track task.id) {
+            <div class="unit-card">
+              <div class="unit-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+              </div>
+              <div class="unit-details">
+                <h3>{{ task.title }}</h3>
+                <span class="unit-meta">{{ task.unit }} • {{ task.points }}</span>
+              </div>
+              <span class="unit-due">{{ task.dueDate }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- PESTAÑA 3: PERSONAS -->
+    @if (currentTab() === 'personas') {
+      <div class="people-layout">
+        
+        <!-- Sección Profesores -->
+        <div class="people-section">
+          <h2 class="people-section-title">Profesores</h2>
+          <div class="person-row">
+            <img src="https://i.pravatar.cc/150?u=carlosf" class="person-avatar" alt="Avatar">
+            <div class="person-info">
+              <span class="person-name">{{ course().professor }}</span>
+              <span class="person-role">Docente Titular</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="people-divider"></div>
+
+        <!-- Sección Compañeros de Clase -->
+        <div class="people-section">
+          <div class="people-section-header">
+            <h2 class="people-section-title">Compañeros de clase</h2>
+            <span class="count-badge">{{ classmates().length }} alumnos</span>
+          </div>
+
+          <div class="people-list">
+            @for (student of classmates(); track student.id) {
+              <div class="person-row">
+                <img [src]="student.avatar" class="person-avatar" alt="Avatar">
+                <div class="person-info">
+                  <span class="person-name">{{ student.name }}</span>
+                  <span class="person-subtag" *ngIf="student.role !== 'Estudiante'">{{ student.role }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+
+  </div>
+
+</div>

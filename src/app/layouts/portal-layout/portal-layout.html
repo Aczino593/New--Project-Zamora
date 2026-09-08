@@ -1,0 +1,192 @@
+<div class="layout-container">
+  
+  <!-- Backdrop para celulares -->
+  <div class="sidebar-backdrop" [ngClass]="{'show': isSidebarOpen && isMobile}" (click)="closeSidebarOnMobile()"></div>
+
+  <!-- Sidebar Lateral -->
+  <aside class="sidebar" [ngClass]="{'open': isSidebarOpen}">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <img src="/favicon.svg" alt="Escudo Institucional" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+      <h2>E.E.T. N°3139</h2>
+      <span class="sidebar-promo">Ciclo Lectivo 2026</span>
+    </div>
+
+    <!-- Navegación con Scroll Interno -->
+    <nav class="sidebar-nav">
+      
+      <!-- Inicio -->
+      <a [routerLink]="homeRoute()" routerLinkActive="active" class="nav-item" (click)="closeSidebarOnMobile()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="nav-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        </svg>
+        <span>Inicio</span>
+      </a>
+
+      <!-- Calendario (Para Todos) -->
+      <a [routerLink]="calendarRoute()" routerLinkActive="active" class="nav-item" (click)="closeSidebarOnMobile()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="nav-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+        </svg>
+        <span>Calendario</span>
+      </a>
+
+      <!-- Notificaciones (Para Todos) -->
+      <a [routerLink]="notifRoute()" routerLinkActive="active" class="nav-item" (click)="closeSidebarOnMobile()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+        </svg>
+        <span>Notificaciones</span>
+      </a>
+
+      <!-- SECCIÓN CURSOS CON SCROLL INTERNO INDEPENDIENTE SEGÚN ANOTACIÓN DEL PDF -->
+      @if (!isTutor()) {
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">{{ role() === 'docente' ? 'MATERIAS A CARGO' : 'CURSOS ASIGNADOS' }}</div>
+
+        <!-- CONTENEDOR CON SCROLL INTERNO INDEPENDIENTE (overflow-y: auto) -->
+        <div class="courses-scroll-container">
+          @for (c of courses(); track c.id) {
+            <a [routerLink]="['/' + (role() === 'docente' ? 'docentes' : 'estudiantes') + '/clases', c.id]" 
+               routerLinkActive="course-active" 
+               class="course-sidebar-item" 
+               (click)="closeSidebarOnMobile()">
+              <div class="course-meta-box">
+                <!-- Curso (ej. 4° 3° CS o 2da 3ra) -->
+                <span class="c-title">{{ c.nombre }}</span>
+                <!-- División: Básico / Superior -->
+                <span class="c-division">{{ c.cycle === 'basico' ? 'Ciclo Básico' : 'Ciclo Superior' }}</span>
+                <!-- Especialidad: Informática / Automotor / Otro -->
+                <span class="c-spec">{{ c.specialty !== '-' ? c.specialty : '-' }}</span>
+              </div>
+            </a>
+          }
+        </div>
+      }
+
+      <div class="sidebar-divider"></div>
+
+      <!-- 1. APARTADO "CREAR NOTICIA": VISIBLE ÚNICAMENTE SI ES DELEGADO O SUBDELEGADO -->
+      <!-- LOS DOCENTES NO DEBEN TENER ESTE APARTADO SEGÚN REGLA EXPLÍCITA -->
+      @if (canViewCrearNoticia()) {
+        <a [routerLink]="crearNoticiaRoute()" routerLinkActive="active" class="nav-item" (click)="closeSidebarOnMobile()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div class="informar-nav-label">
+            <span>Crear Noticia</span>
+            <span class="badge-mini">Delegado</span>
+          </div>
+        </a>
+      }
+
+      <!-- 2. APARTADO "CHAT" (RENOMBRADO DE INFORMAR PARA ESTUDIANTES DELEGADOS) -->
+      <!-- PROPÓSITO: CONSULTAR A PROFESORES NOVEDADES O SI HABRÁ CLASES -->
+      <!-- ALUMNOS REGULARES NO DEBEN VERLO -->
+      @if (canViewChat()) {
+        <a [routerLink]="chatRoute()" routerLinkActive="active" class="nav-item" (click)="closeSidebarOnMobile()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+          </svg>
+          <div class="informar-nav-label">
+            <span>Chat</span>
+            <span class="badge-mini">Consultas</span>
+          </div>
+        </a>
+      }
+
+      <!-- 3. APARTADO "INFORMAR" EXCLUSIVO PARA DOCENTES (DEBAJO DE MATERIAS A CARGO) -->
+      @if (canViewInformar()) {
+        <a [routerLink]="informarRoute()" routerLinkActive="active" class="nav-item" (click)="closeSidebarOnMobile()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="nav-icon">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+          </svg>
+          <span>Informar</span>
+        </a>
+      }
+
+      <div style="flex-grow: 1;"></div>
+
+      <!-- Configuración (Para Todos) -->
+      <a [routerLink]="configRoute()" routerLinkActive="active" class="nav-item config-nav-item" (click)="closeSidebarOnMobile()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="nav-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span>Configuración</span>
+      </a>
+
+    </nav>
+  </aside>
+
+  <!-- Contenido Principal -->
+  <main class="main-content">
+    
+    <!-- Header Superior -->
+    <header class="header">
+      <div class="header-left">
+        <button class="btn-icon menu-toggle" (click)="toggleSidebar()" aria-label="Abrir menú">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 24px; height: 24px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+        <span class="school-name-header">E.E.T. N°3139 "Martín Miguel de Güemes"</span>
+      </div>
+
+      <div class="header-right">
+        <!-- Acceso directo a Notificaciones -->
+        <button class="btn-icon notification-bell" [routerLink]="notifRoute()" title="Notificaciones">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 24px; height: 24px;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+          </svg>
+          <div class="notification-dot"></div>
+        </button>
+
+        <!-- Perfil de Usuario con Dropdown (Nombre, Email, Rol) -->
+        <div class="user-menu-container">
+          <button class="btn-icon user-avatar" (click)="toggleProfileMenu()" title="Mi Perfil">
+            <img [src]="user()?.avatar" alt="Avatar" class="avatar-img" *ngIf="user()?.avatar">
+          </button>
+          
+          <div class="profile-dropdown" [class.show]="isProfileMenuOpen">
+            <div class="profile-info">
+              <div class="profile-name">{{ user()?.name || 'Usuario' }}</div>
+              <div class="profile-email">{{ user()?.email }}</div>
+              <div class="profile-role-line">
+                <span class="role-badge">{{ user()?.isDelegado ? 'Delegado' : (user()?.role || 'Usuario') }}</span>
+              </div>
+            </div>
+
+            <!-- Botón de prueba para alternar modo delegado si es estudiante -->
+            @if (role() === 'estudiante') {
+              <div class="profile-tools">
+                <button class="btn-toggle-delegado" (click)="toggleDelegadoMode()">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  <span>Alternar Delegado: {{ user()?.isDelegado ? 'SÍ' : 'NO' }}</span>
+                </button>
+              </div>
+            }
+
+            <div class="profile-actions">
+              <button class="btn-logout" (click)="logout()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 20px; height: 20px;">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                </svg>
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Área de Páginas Inyectadas -->
+    <div class="page-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+
+  </main>
+</div>

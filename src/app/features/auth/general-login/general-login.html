@@ -1,0 +1,95 @@
+<div class="login-wrapper">
+  
+  <div class="school-brand">
+    <div class="logo-container">
+      <!-- Icono de Tailwind (Heroicons: Academic Cap) -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 48px; height: 48px;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+      </svg>
+    </div>
+    <h1>E.E.T. N°3139</h1>
+    <h2>"Martín Miguel de Güemes"</h2>
+  </div>
+
+  <div class="login-card">
+    <div class="login-header">
+      <h3>Iniciar Sesión</h3>
+      <p>Ingresá tus credenciales para acceder al sistema</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      
+      <!-- Campo DNI -->
+      <div class="form-group">
+        <label for="dni">Documento (DNI)</label>
+        <div class="input-container">
+          <input 
+            type="text" 
+            id="dni" 
+            formControlName="dni" 
+            class="input-control" 
+            [ngClass]="{'is-invalid': dniControl?.invalid && dniControl?.touched}"
+            placeholder="Ej: 35123456" 
+            autocomplete="off">
+        </div>
+        <span class="error-text" *ngIf="dniControl?.hasError('required') && dniControl?.touched">El DNI es obligatorio.</span>
+        <span class="error-text" *ngIf="dniControl?.hasError('pattern') && dniControl?.touched">Solo se permiten números.</span>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <div class="input-container">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            formControlName="password" 
+            class="input-control"
+            [ngClass]="{'is-invalid': passwordControl?.invalid && passwordControl?.touched}" 
+            placeholder="••••••••">
+          
+          <!-- Icono de Tailwind (Heroicons: Eye/Eye Slash) -->
+          <span class="input-icon" (click)="togglePasswordVisibility()">
+            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height: 20px;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height: 20px;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+            </svg>
+          </span>
+        </div>
+        <span class="error-text" *ngIf="passwordControl?.invalid && passwordControl?.touched">Ingresa tu contraseña.</span>
+      </div>
+
+      <!-- Campo Tipo de Usuario -->
+      <div class="form-group">
+        <label for="role">Tipo de Usuario</label>
+        <div class="input-container">
+          <!-- Icono de Tailwind (Heroicons: User) -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px; position: absolute; left: 1rem; color: #6b7280;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+          </svg>
+          <select id="role" formControlName="role" class="input-control" style="padding-left: 2.5rem;" [ngClass]="{'is-invalid': roleControl?.invalid && roleControl?.touched}">
+            <option value="" disabled selected>Selecciona tu rol...</option>
+            <option value="estudiante">Estudiante</option>
+            <option value="docente">Docente</option>
+            <option value="tutor">Tutor / Familiar</option>
+            <option value="preceptor">Preceptor</option>
+          </select>
+        </div>
+        <span class="error-text" *ngIf="roleControl?.invalid && roleControl?.touched">Debes seleccionar un tipo de usuario.</span>
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="!loginForm.valid">
+        Iniciar Sesión
+      </button>
+
+    </form>
+  </div>
+
+  <div class="footer">
+    <p>© 2026 — E.E.T. N°3139 "Martín Miguel de Güemes"</p>
+  </div>
+
+</div>

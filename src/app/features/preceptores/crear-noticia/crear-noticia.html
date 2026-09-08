@@ -1,0 +1,188 @@
+<div class="news-page fade-in">
+  <!-- Hero Section -->
+  <div class="news-hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Comunicación Institucional</h1>
+      <p class="hero-subtitle">Redacta y gestiona las noticias y eventos que verán los estudiantes, docentes y tutores.</p>
+    </div>
+  </div>
+
+  <!-- Pestañas -->
+  <div class="tabs-container">
+    <button class="tab-btn" [class.active]="currentTab() === 'redactar'" (click)="setTab('redactar')">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
+      Redactar Noticia
+    </button>
+    <button class="tab-btn" [class.active]="currentTab() === 'historial'" (click)="setTab('historial')">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 011.875 1.875v1.5c0 1.036-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 01-1.875-1.875v-1.5c0-1.036.84-1.875 1.875-1.875z" /></svg>
+      Historial y Gestión
+    </button>
+  </div>
+
+  <div class="tab-content">
+    
+    <!-- PESTAÑA: REDACTAR -->
+    @if (currentTab() === 'redactar') {
+      <div class="compose-section fade-in">
+        <div class="form-card">
+          <div class="form-header">
+            <h2>Nueva Publicación</h2>
+            <div class="form-group row-align">
+              <label>Tipo de Publicación:</label>
+              <select class="input-field select-type" [(ngModel)]="formData().type">
+                <option value="INSTITUCIONAL">Institucional</option>
+                <option value="EVENTO">Evento</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-body">
+            <div class="form-group">
+              <label>Título de la Noticia <span class="required">*</span></label>
+              <input type="text" class="input-field title-input" [(ngModel)]="formData().title" placeholder="Ej. Acto del 25 de Mayo" maxlength="100">
+            </div>
+
+            <div class="form-group">
+              <label>Descripción / Cuerpo</label>
+              <textarea class="input-field desc-input" [(ngModel)]="formData().description" rows="5" placeholder="Escribe todos los detalles importantes aquí..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Imagen de Portada (Opcional)</label>
+              
+              @if (!formData().imagePreview) {
+                <div class="image-upload-box" onclick="document.getElementById('file-upload').click()">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="upload-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                  <span>Haz clic aquí para subir una imagen</span>
+                  <input type="file" id="file-upload" accept="image/*" style="display: none;" (change)="onImageSelected($event)">
+                </div>
+              } @else {
+                <div class="image-preview-container">
+                  <img [src]="formData().imagePreview" alt="Previsualización" class="image-thumbnail" (click)="openImagePreview(formData().imagePreview)">
+                  <div class="preview-actions">
+                    <span class="preview-hint">Toca la imagen para verla en pantalla completa</span>
+                    <button class="btn-danger-outline" (click)="removeImage()">Cambiar o Eliminar</button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <button class="btn-primary btn-large" [disabled]="!canPublish()" (click)="publishNews()">
+              Publicar Noticia
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- PESTAÑA: HISTORIAL -->
+    @if (currentTab() === 'historial') {
+      <div class="history-section fade-in">
+        <div class="history-grid">
+          @for (news of newsList(); track news.id) {
+            <div class="news-card" [class.disabled-card]="!news.isActive">
+              <div class="news-card-header">
+                <span class="news-badge" [class.institucional]="news.type === 'INSTITUCIONAL'" [class.evento]="news.type === 'EVENTO'">{{ news.type }}</span>
+                <span class="news-date">{{ news.date | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <h3 class="news-card-title">{{ news.title }}</h3>
+              <p class="news-card-desc">{{ news.description }}</p>
+              
+              <div class="news-card-footer">
+                <div class="toggle-container">
+                  <label class="switch">
+                    <input type="checkbox" [checked]="news.isActive" (change)="toggleStatus(news.id)">
+                    <span class="slider round"></span>
+                  </label>
+                  <span class="status-label" [class.active-text]="news.isActive">{{ news.isActive ? 'Habilitada' : 'Deshabilitada' }}</span>
+                </div>
+                <button class="btn-secondary btn-small" (click)="openEditModal(news)">Editar</button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- ================= MODALES ================= -->
+
+<!-- Modal: Previsualización de Imagen Completa -->
+@if (imagePreviewModalUrl()) {
+  <div class="modal-backdrop fade-in" (click)="closeImagePreview()" style="z-index: 2000;">
+    <div class="modal-image-content">
+      <button class="close-image-btn" (click)="closeImagePreview()">✕</button>
+      <img [src]="imagePreviewModalUrl()" alt="Vista Completa">
+    </div>
+  </div>
+}
+
+<!-- Modal: Estado de Publicación (Cargando / Éxito) -->
+@if (creationState() !== 'idle') {
+  <div class="modal-backdrop fade-in">
+    <div class="loading-modal-content">
+      @if (creationState() === 'loading') {
+        <div class="spinner"></div>
+        <h2>Publicando Noticia...</h2>
+        <p>Procesando información e imagen en los servidores.</p>
+      } @else if (creationState() === 'success') {
+        <div class="success-icon-large">✓</div>
+        <h2>¡Noticia Publicada!</h2>
+        <p>La publicación ya está activa en los tableros.</p>
+      }
+    </div>
+  </div>
+}
+
+<!-- Modal: Editar Noticia -->
+@if (editingNews()) {
+  <div class="modal-backdrop fade-in" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Editar Noticia</h2>
+        <button class="btn-icon" (click)="closeEditModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        
+        <div class="form-group row-align mb-3">
+          <label>Tipo:</label>
+          <select class="input-field select-type w-auto" [(ngModel)]="editingNews()!.type">
+            <option value="INSTITUCIONAL">Institucional</option>
+            <option value="EVENTO">Evento</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" class="input-field" [(ngModel)]="editingNews()!.title">
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea class="input-field" rows="4" [(ngModel)]="editingNews()!.description"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Imagen</label>
+          @if (!editingNews()!.image) {
+            <input type="file" class="input-field" accept="image/*" (change)="onImageSelected($event, true)">
+          } @else {
+            <div class="image-preview-container small">
+              <img [src]="editingNews()!.image" alt="Previsualización" class="image-thumbnail small">
+              <button class="btn-danger-outline btn-small" (click)="removeImage(true)">Eliminar Imagen</button>
+            </div>
+          }
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeEditModal()">Cancelar</button>
+        <button class="btn-primary" (click)="saveEdit()">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+}
